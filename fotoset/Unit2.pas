@@ -1,0 +1,95 @@
+unit Unit2;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, StdCtrls, Unit1, DB, ADODB;
+
+type
+  TForm2 = class(TForm)
+    Edit1: TEdit;
+    Edit2: TEdit;
+    Label1: TLabel;
+    Label2: TLabel;
+    Button1: TButton;
+    Button2: TButton;
+    ADOQuery1: TADOQuery;
+    Button3: TButton;
+    procedure Button1Click(Sender: TObject);
+    procedure Button2Click(Sender: TObject);
+    procedure Button3Click(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  Form2: TForm2;
+
+implementation
+
+{$R *.dfm}
+
+procedure TForm2.Button1Click(Sender: TObject);
+begin
+  ADOQuery1.Close;
+  ADOQuery1.SQL.Clear;
+  ADOQuery1.Parameters.AddParameter.Name := 'login';
+  ADOQuery1.Parameters.AddParameter.Name := 'password';
+  ADOQuery1.SQL.Text := 'select * from Сотрудники where Логин = :login and Пароль=:password';
+  ADOQuery1.Parameters.ParamByName('login').Value := Edit1.Text;
+  ADOQuery1.Parameters.ParamByName('password').Value := Edit2.Text;
+  ADOQuery1.Active := True;
+  ADOQuery1.ExecSQL;
+  if ADOQuery1.RecordCount > 0 then
+  begin
+    Form1.Label14.Caption := 'Добро пожаловать, ' + ADOQuery1.FieldByName('ФИО').AsString;
+    Form1.Label16.Caption := 'Вы: Администратор';
+    Form1.TabSheet1.TabVisible := true;
+    Form1.TabSheet2.TabVisible := true;
+    Form1.TabSheet3.TabVisible := true;
+    Form1.TabSheet4.TabVisible := true;
+    Form1.DBEdit12.Enabled := true;
+    Form1.DBEdit13.Enabled := true;
+    Form1.Button4.Enabled := true;
+    Form1.DBNavigator4.Enabled := true;
+    Form1.Show;
+    Form2.Hide;
+
+    if ((Edit1.Text <> 'a') and (Edit2.Text <> 'a')) then
+    begin
+      Form1.TabSheet3.TabVisible := false;
+      Form1.Label16.Caption := 'Вы: Менеджер';
+    end;
+
+  end
+  else
+    ShowMessage('Ошибка авторизации.');
+end;
+
+procedure TForm2.Button2Click(Sender: TObject);
+begin
+  Edit1.Text := '';
+  Edit2.Text := '';
+end;
+
+procedure TForm2.Button3Click(Sender: TObject);
+begin
+  Form1.Label14.Caption := 'Добро пожаловать, Гость';
+  Form1.Label16.Caption := 'Вы: Гость';
+  Form1.TabSheet1.TabVisible := false;
+  Form1.TabSheet2.TabVisible := false;
+  Form1.TabSheet3.TabVisible := false;
+  Form1.TabSheet4.TabVisible := true;
+  Form1.DBEdit12.Enabled := false;
+  Form1.DBEdit13.Enabled := false;
+  Form1.Button4.Enabled := false;
+  Form1.DBNavigator4.Enabled := false;
+  Form1.DBGrid4.ReadOnly := true;
+  Form1.Show;
+  Form2.Hide;
+end;
+
+end.
